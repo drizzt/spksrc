@@ -1,0 +1,92 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9487ab9..a2872c3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,12 +29,7 @@ PKG_CHECK_MODULES(LAVF libavformat REQUIRED)
+ PKG_CHECK_MODULES(LAVR libswresample REQUIRED)
+ PKG_CHECK_MODULES(LAVU libavutil REQUIRED)
+ PKG_CHECK_MODULES(LTAG taglib REQUIRED)
+-
+-FIND_PACKAGE(EBUR128)
+-
+-IF (NOT EBUR128_FOUND)
+-  MESSAGE(FATAL_ERROR "libebur128 not found.")
+-ENDIF (NOT EBUR128_FOUND)
++PKG_CHECK_MODULES(EBUR128 libebur128 REQUIRED)
+ 
+ FILE(GLOB SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cc" "src/*.c")
+ 
+@@ -42,7 +37,7 @@ ADD_EXECUTABLE(loudgain ${SOURCES})
+ 
+ INCLUDE_DIRECTORIES(
+   ${CMAKE_CURRENT_SOURCE_DIR}/src
+-  ${EBUR128_INCLUDE_DIR}
++  ${EBUR128_INCLUDE_DIRS}
+   ${LAVC_INCLUDE_DIRS}
+   ${LAVF_INCLUDE_DIRS}
+   ${LAVR_INCLUDE_DIRS}
+@@ -60,7 +55,7 @@ CONFIGURE_FILE("config.h.in" "config.h")
+ SET(LIBS )
+ 
+ TARGET_LINK_LIBRARIES(loudgain
+-  ${EBUR128_LIBRARY}
++  ${EBUR128_LIBRARIES}
+   ${LAVC_LIBRARIES}
+   ${LAVF_LIBRARIES}
+   ${LAVR_LIBRARIES}
+@@ -72,7 +67,7 @@ SET_TARGET_PROPERTIES(loudgain PROPERTIES
+   COMPILE_FLAGS "-Wall -pedantic -g"
+ )
+ 
+-SET(CMAKE_C_FLAGS "-std=gnu99 -D_GNU_SOURCE")
++SET(CMAKE_C_FLAGS "-std=gnu99 -D_GNU_SOURCE ${EBUR128_CFLAGS}")
+ 
+ SET(CMAKE_CXX_FLAGS "-std=gnu++11 -D_GNU_SOURCE")
+ 
+diff --git a/cmake/FindEBUR128.cmake b/cmake/FindEBUR128.cmake
+deleted file mode 100644
+index 5da1459..0000000
+--- a/cmake/FindEBUR128.cmake
++++ /dev/null
+@@ -1,41 +0,0 @@
+-# Locate libebur128 library
+-# This module defines
+-# EBUR128_LIBRARY, the name of the library to link against
+-# EBUR128_FOUND, if false, do not try to link
+-# EBUR128_INCLUDE_DIR, where to find header
+-#
+-set(EBUR128_FOUND FALSE)
+-
+-find_path(EBUR128_INCLUDE_DIR
+-  NAMES ebur128.h
+-  HINTS
+-  PATH_SUFFIXES include
+-  PATHS
+-  ~/Library/Frameworks
+-  /Library/Frameworks
+-  /usr/local/include
+-  /usr/include
+-  /sw/include
+-  /opt/local/include
+-  /opt/csw/include
+-  /opt/include
+-  /mingw
+-)
+-
+-find_library(EBUR128_LIBRARY
+-  NAMES ebur128
+-  HINTS
+-  PATH_SUFFIXES lib64 lib
+-  PATHS
+-  /usr/local
+-  /usr
+-  /sw
+-  /opt/local
+-  /opt/csw
+-  /opt
+-  /mingw
+-)
+-
+-if(EBUR128_LIBRARY)
+-  set(EBUR128_FOUND TRUE)
+-endif(EBUR128_LIBRARY)

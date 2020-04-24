@@ -1,0 +1,3 @@
+lnk:lib/libebur128.so
+lnk:lib/libebur128.so.1
+lib:lib/libebur128.so.1.2.4
